@@ -88,11 +88,13 @@ nav.sc{background:rgba(23,61,48,.88);backdrop-filter:blur(14px);box-shadow:0 8px
 .card{grid-column:span 4;position:relative}
 .card:nth-child(1),.card:nth-child(4){grid-column:span 7}.card:nth-child(2),.card:nth-child(3){grid-column:span 5}
 .card:nth-child(4){grid-column:span 5}.card:nth-child(5){grid-column:span 7}.card:nth-child(6){grid-column:span 12}
-.card .im{overflow:hidden;aspect-ratio:3/2;position:relative;background:var(--choc)}
+.card .im{overflow:hidden;aspect-ratio:3/2;position:relative;background:var(--choc);box-shadow:0 18px 40px -18px rgba(43,27,19,.55)}
 .card:nth-child(6) .im{aspect-ratio:21/8}
-.card .im>svg{width:100%;height:100%;display:block;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
-.card:hover .im>svg{transform:scale(1.09) rotate(.6deg)}
-.ov{position:absolute;inset:0;display:flex;align-items:flex-end;padding:22px;background:linear-gradient(0deg,rgba(23,61,48,.92),rgba(23,61,48,0) 65%);opacity:0;transition:opacity .5s}
+.card .im>svg,.card .im>.ph{width:100%;height:100%;display:block;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.card .im>.ph{position:absolute;inset:0;object-fit:cover;opacity:0;transition:opacity .8s,transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.card:hover .im>svg,.card:hover .im>.ph{transform:scale(1.09) rotate(.6deg)}
+.card .im::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 60px rgba(43,27,19,.35)}
+.ov{position:absolute;inset:0;z-index:2;display:flex;align-items:flex-end;padding:22px;background:linear-gradient(0deg,rgba(23,61,48,.92),rgba(23,61,48,0) 65%);opacity:0;transition:opacity .5s}
 .card:hover .ov,.card:focus-within .ov{opacity:1}
 .ov .wa{transform:translateY(16px);transition:transform .5s}.card:hover .ov .wa,.card:focus-within .ov .wa{transform:none}
 .card .meta{padding:18px 2px 0}
@@ -114,6 +116,8 @@ nav.sc{background:rgba(23,61,48,.88);backdrop-filter:blur(14px);box-shadow:0 8px
 .room .sofa::before{background:var(--s);filter:brightness(1.2)}
 .room .lamp{position:absolute;left:22%;bottom:40%;width:1.2%;height:22%;background:var(--cream);opacity:.8}
 .room .lamp::before{content:"";position:absolute;left:-250%;top:-10%;width:600%;height:30%;background:var(--cream);clip-path:polygon(20% 0,80% 0,100% 100%,0 100%)}
+.room .pimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .7s;z-index:2}
+.room.photo .pimg{opacity:1}
 .rl{position:absolute;left:16px;bottom:12px;font:italic 500 22px var(--serif);color:var(--cream);text-shadow:0 2px 12px #000;z-index:3}
 .ctl h3{font-size:22px;margin-bottom:12px;color:var(--cream)}
 .tabs{display:flex;flex-direction:column;gap:6px;margin-bottom:28px}
@@ -121,8 +125,9 @@ nav.sc{background:rgba(23,61,48,.88);backdrop-filter:blur(14px);box-shadow:0 8px
 .tabs button[aria-pressed=true]{border-color:var(--cream);opacity:1;background:rgba(242,235,221,.08);padding-left:22px}
 .tabs button:hover{opacity:1}
 .th{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.th button{padding:0;border:2px solid transparent;background:none;cursor:pointer;aspect-ratio:3/2;overflow:hidden;transition:.3s}
-.th button svg{width:100%;height:100%;display:block}
+.th button{padding:0;border:2px solid transparent;background:none;cursor:pointer;aspect-ratio:3/2;overflow:hidden;transition:.3s;position:relative}
+.th button svg,.th button .ph{width:100%;height:100%;display:block}
+.th button .ph{position:absolute;inset:0;object-fit:cover;opacity:0;transition:opacity .6s}
 .th button[aria-pressed=true]{border-color:var(--cream)}
 /* STORY */
 #about{padding:130px 0;background:var(--choc)}
@@ -166,12 +171,21 @@ nav.open .nl{transform:none}nav.open .burger i:first-child{transform:translateY(
 .card,.card:nth-child(n){grid-column:span 12}.card:nth-child(6) .im{aspect-ratio:3/2}
 .sr,.st,.fg{grid-template-columns:1fr}.vals{grid-template-columns:1fr}.cg{grid-template-columns:1fr 1fr}.st{gap:40px}
 .mask{max-width:360px}
+.tabs{flex-direction:row;flex-wrap:wrap}.tabs button{border-left:0;border-bottom:2px solid var(--walnut)}.tabs button[aria-pressed=true]{padding-left:14px}
 }
 @media(max-width:520px){.cg{grid-template-columns:1fr}.cta .btn{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
 </style>
 </head>
 <body class="lock">
+
+<!-- shared wool grain + light falloff used by every carpet graphic (fallback look) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+ <defs>
+  <filter id="wool" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85 .6" numOctaves="3" seed="4" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .17  0 0 0 0 .1  0 0 0 0 .07  0 0 0 .9 -.28"/></filter>
+  <linearGradient id="lit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient>
+ </defs>
+</svg>
 
 <div id="intro" role="dialog" aria-label="Welcome">
   <h2>AL KESEB ARABIA MEJLIS PLC<small>FINE CARPETS</small></h2>
@@ -228,7 +242,7 @@ nav.open .nl{transform:none}nav.open .burger i:first-child{transform:translateY(
   <div class="wrap">
     <div class="hd"><h2>FIND THE PERFECT CARPET FOR YOUR SPACE.</h2><p>Step into a room, then lay each design on the floor to see how it changes the space.</p></div>
     <div class="sr">
-      <div class="room" id="room"><div class="wall"></div><div class="win"></div><div class="lamp"></div><div class="sofa"></div><div class="flr"><div class="cp" id="rc"></div></div><div class="rl" id="rl"></div></div>
+      <div class="room" id="room"><div class="wall"></div><div class="win"></div><div class="lamp"></div><div class="sofa"></div><div class="flr"><div class="cp" id="rc"></div></div><img class="pimg" id="rimg" alt="" decoding="async"><div class="rl" id="rl"></div></div>
       <div class="ctl">
         <h3>Choose a room</h3><div class="tabs" id="tabs"></div>
         <h3>Choose a carpet</h3><div class="th" id="th"></div>
@@ -278,14 +292,22 @@ nav.open .nl{transform:none}nav.open .burger i:first-child{transform:translateY(
 const PHONE_LOCAL='0980162014', PHONE_INTL='+251980162014', WA='251980162014';
 const TELEGRAM_URL=''; /* paste the company Telegram link here, e.g. https://t.me/username */
 const TIKTOK_URL='https://www.tiktok.com/@sihame129?_r=1&_t=ZS-9B6MDzlbOPn';
-/* Edit names, categories and descriptions to match real inventory. */
+
+/* ===== PHOTO SETTINGS =====
+   Put your real photographs in these folders (JPG or WebP, same file names):
+   images/products/<key>.jpg      1500x1000  (one per carpet below)
+   images/rooms/<roomKey>-<carpetKey>.jpg   1600x1000  (5 rooms x 6 carpets = 30 files)
+   Any photo that is missing falls back to the built-in graphic automatically: nothing breaks. */
+const IMG_BASE='images/', IMG_EXT='.jpg';
+
+/* name, category, description, photo key */
 const PRODUCTS=[
- ['Majlis Emerald','Arabian Carpets','A deep green field framed in warm brown, made for a majlis.'],
- ['Heritage Medallion','Persian Carpets','A central medallion and layered borders in the Persian tradition.'],
- ['Walnut Tradition','Traditional Carpets','Classic pattern in rich walnut tones.'],
- ['Forest Line','Modern Carpets','Calm, geometric and easy to live with.'],
- ['Ivory Salon','Luxury Rugs','A light, soft surface that opens up a room.'],
- ['Chocolate Reception','Living Room Carpets','A broad, grounding carpet for large living and reception rooms.']
+ ['Majlis Emerald','Arabian Carpets','A deep green field framed in warm brown, made for a majlis.','majlis-emerald'],
+ ['Heritage Medallion','Persian Carpets','A central medallion and layered borders in the Persian tradition.','heritage-medallion'],
+ ['Walnut Tradition','Traditional Carpets','Classic pattern in rich walnut tones.','walnut-tradition'],
+ ['Forest Line','Modern Carpets','Calm, geometric and easy to live with.','forest-line'],
+ ['Ivory Salon','Luxury Rugs','A light, soft surface that opens up a room.','ivory-salon'],
+ ['Chocolate Reception','Living Room Carpets','A broad, grounding carpet for large living and reception rooms.','chocolate-reception']
 ];
 const PAL=[['#173D30','#A88A6A','#F2EBDD','#4B3023'],['#4B3023','#A88A6A','#F2EBDD','#173D30'],['#70503A','#F2EBDD','#214B38','#4B3023'],['#214B38','#F2EBDD','#173D30','#70503A'],['#F2EBDD','#70503A','#173D30','#FAF7F0'],['#4B3023','#214B38','#A88A6A','#173D30']];
 const dm=r=>`${-r},0 0,${-r} ${r},0 0,${r}`;
@@ -299,17 +321,21 @@ function inner(i){
  s+=`<g transform="translate(150 100)"><polygon points="${dm(64)}" fill="${a}" stroke="${b}" stroke-width="2"/><polygon points="${dm(52)}" fill="none" stroke="${c}" stroke-width="1.5"/>`;
  if(i%2){s+=`<circle r="40" fill="${c}"/><circle r="30" fill="${d}"/><circle r="19" fill="${b}"/>`}else{s+=`<polygon points="${dm(42)}" fill="${c}"/><polygon points="${dm(30)}" fill="${d}"/><polygon points="${dm(18)}" fill="${b}"/>`}
  s+=`<rect x="-9" y="-9" width="18" height="18" fill="${a}" transform="rotate(45)"/><rect x="-6" y="-6" width="12" height="12" fill="${c}"/></g>`;
+ /* wool grain + soft light */
+ s+=`<rect width="300" height="200" filter="url(#wool)" opacity=".55" style="mix-blend-mode:multiply"/><rect width="300" height="200" fill="url(#lit)"/>`;
  return s}
 const carpet=(i,cls='')=>`<svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true" class="${cls}">${inner(i)}</svg>`;
 const $=s=>document.querySelector(s);
 const waLink=t=>`https://wa.me/${WA}?text=${encodeURIComponent(t)}`;
+/* photo layer: fades in over the graphic only if the file loads; removed silently if it does not */
+const photo=(key,alt,w,h)=>`<img class="ph" src="${IMG_BASE}products/${key}${IMG_EXT}" alt="${alt}" width="${w}" height="${h}" loading="lazy" decoding="async" onload="this.style.opacity=1" onerror="this.remove()">`;
 
 /* Static carpets */
 $('#hc').innerHTML=carpet(0);$('#ic').innerHTML=carpet(1);
 $('#mk').innerHTML=carpet(2);
 
 /* Collection */
-$('#grid').innerHTML=PRODUCTS.map((p,i)=>`<article class="card"><div class="im">${carpet(i)}<div class="ov"><a class="btn wa" href="${waLink('Hello, I would like to ask about the '+p[0]+' carpet.')}" target="_blank" rel="noopener">Inquire on WhatsApp</a></div></div><div class="meta"><div class="cat">${p[1]}</div><h3>${p[0]}</h3><p class="ds">${p[2]}</p></div></article>`).join('');
+$('#grid').innerHTML=PRODUCTS.map((p,i)=>`<article class="card"><div class="im">${carpet(i)}${photo(p[3],p[0]+' carpet',1500,1000)}<div class="ov"><a class="btn wa" href="${waLink('Hello, I would like to ask about the '+p[0]+' carpet.')}" target="_blank" rel="noopener">Inquire on WhatsApp</a></div></div><div class="meta"><div class="cat">${p[1]}</div><h3>${p[0]}</h3><p class="ds">${p[2]}</p></div></article>`).join('');
 
 /* Assembly (scroll scrubbed) */
 (function(){
@@ -326,14 +352,22 @@ $('#grid').innerHTML=PRODUCTS.map((p,i)=>`<article class="card"><div class="im">
  addEventListener('scroll',upd,{passive:true});addEventListener('resize',upd);upd();
 })();
 
-/* Showroom */
+/* Showroom: real room photos per room + carpet; CSS room is the fallback */
 (function(){
- const R=[['Luxury living room','#6a5444','#3a2a1e','#173D30','36%','15%'],['Modern apartment','#cfc6b4','#8a7358','#4B3023','44%','13%'],['Arabian majlis','#214B38','#4B3023','#70503A','78%','9%'],['Elegant bedroom','#8a735c','#5a4332','#A88A6A','40%','17%'],['Reception room','#173D30','#2B1B13','#A88A6A','56%','12%']];
- const room=$('#room'),rc=$('#rc'),tabs=$('#tabs'),th=$('#th');let ri=0,ci=0;
+ /* label, wall, floor, sofa, sofaW, sofaH, photo key */
+ const R=[['Arabian majlis','#214B38','#4B3023','#70503A','78%','9%','majlis'],['Modern living room','#cfc6b4','#8a7358','#4B3023','44%','13%','modern'],['Traditional living room','#6a5444','#3a2a1e','#173D30','36%','15%','traditional'],['Elegant bedroom','#8a735c','#5a4332','#A88A6A','40%','17%','bedroom'],['Luxury reception room','#173D30','#2B1B13','#A88A6A','56%','12%','reception']];
+ const room=$('#room'),rc=$('#rc'),rimg=$('#rimg'),tabs=$('#tabs'),th=$('#th');let ri=0,ci=0,tok=0;
  tabs.innerHTML=R.map((r,i)=>`<button type="button" aria-pressed="${i==0}">${r[0]}</button>`).join('');
- th.innerHTML=PRODUCTS.map((p,i)=>`<button type="button" aria-label="${p[0]}" aria-pressed="${i==0}">${carpet(i)}</button>`).join('');
- function draw(){const r=R[ri],s=room.style;s.setProperty('--w',r[1]);s.setProperty('--f',r[2]);s.setProperty('--s',r[3]);s.setProperty('--sw',r[4]);s.setProperty('--sh',r[5]);$('#rl').textContent=r[0]+' · '+PRODUCTS[ci][0];
+ th.innerHTML=PRODUCTS.map((p,i)=>`<button type="button" aria-label="${p[0]}" aria-pressed="${i==0}">${carpet(i)}${photo(p[3],'',300,200)}</button>`).join('');
+ function draw(){
+  const r=R[ri],s=room.style,name=r[0]+' · '+PRODUCTS[ci][0];
+  s.setProperty('--w',r[1]);s.setProperty('--f',r[2]);s.setProperty('--s',r[3]);s.setProperty('--sw',r[4]);s.setProperty('--sh',r[5]);$('#rl').textContent=name;
   rc.style.opacity=0;setTimeout(()=>{rc.innerHTML=carpet(ci);rc.style.opacity=1},220);
+  /* preload the matching room photo; swap only when ready, otherwise keep the CSS room */
+  const src=`${IMG_BASE}rooms/${r[6]}-${PRODUCTS[ci][3]}${IMG_EXT}`,t=++tok,im=new Image();
+  im.onload=()=>{if(t!==tok)return;rimg.src=src;rimg.alt=name+' room preview';room.classList.add('photo')};
+  im.onerror=()=>{if(t!==tok)return;room.classList.remove('photo')};
+  im.src=src;
   [...tabs.children].forEach((b,i)=>b.setAttribute('aria-pressed',i==ri));[...th.children].forEach((b,i)=>b.setAttribute('aria-pressed',i==ci))}
  tabs.onclick=e=>{const i=[...tabs.children].indexOf(e.target.closest('button'));if(i>-1){ri=i;draw()}};
  th.onclick=e=>{const i=[...th.children].indexOf(e.target.closest('button'));if(i>-1){ci=i;draw()}};
